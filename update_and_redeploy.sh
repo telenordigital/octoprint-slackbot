@@ -11,7 +11,5 @@ set -e
 
 echo "origin has changed - updating"
 git pull --rebase
-yarn install
-yarn test
-rm -rf /opt/octoprint-slackbot/*
-cp -r * /opt/octoprint-slackbot/
+
+./redeploy.sh
