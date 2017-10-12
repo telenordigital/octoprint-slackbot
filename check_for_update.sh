@@ -3,7 +3,8 @@
 git remote update
 git status | grep behind
 
-if [ $? -gt 0 ] then
+if [ $? -gt 0 ]
+then
   exit 0
 fi
 
