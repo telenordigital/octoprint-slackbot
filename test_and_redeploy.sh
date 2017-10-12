@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "$(dirname "$0")"
+
 yarn install
 yarn test
 rm -rf /opt/octoprint-slackbot/*
