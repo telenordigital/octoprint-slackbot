@@ -13,4 +13,4 @@ set -e
 echo "origin has changed - updating"
 git pull --rebase
 
-./redeploy.sh
+./test_and_redeploy.sh
