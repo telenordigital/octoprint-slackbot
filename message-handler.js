@@ -20,7 +20,7 @@ module.exports = {
         if (!text) {
             Promise.reject(new TypeError("Message text can't be empty"));
         } else if (text.includes('status')) {
-            console.log('status requested');
+            console.log('status requested (foo)');
             return promiseProps({
                 version: octoprint.getVersion(),
                 connection: octoprint.getConnection(),
