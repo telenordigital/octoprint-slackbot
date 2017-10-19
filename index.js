@@ -60,11 +60,11 @@ bot.on('message', (event) => {
     // const isFileAnnouncement = type && type === 'message' && file;
 
     if (!isMention || !isFile) {
+        bot.postMessageToGroup('octoprint-bot-test', `test ${isMention} ${isFile}`);
         return; // ignore messages that doesn't mention the bot
     }
 
     const fileInfoPromise = (isFile ? getFileInfo(file.id) : Promise.resolve(null));
-    respondTo(event, `test`);
 
     messageHandler.handle({ text, fileInfoPromise })
         .then(({ responseText, imageURL }) => {
