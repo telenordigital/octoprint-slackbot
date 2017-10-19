@@ -59,7 +59,7 @@ bot.on('message', (event) => {
     const isFile = type && type === 'file_shared' && file;
     // const isFileAnnouncement = type && type === 'message' && file;
 
-    if (!isMention || !isFile) {
+    if (!isMention && !isFile) {
         return; // ignore messages that doesn't mention the bot
     }
 
