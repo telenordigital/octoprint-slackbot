@@ -64,8 +64,12 @@ bot.on('message', (event) => {
     const fileInfoPromise = (isFile ? getFileInfo(file.id) : Promise.resolve(null));
 
     messageHandler.handle({ text, fileInfoPromise })
-        .then((responseText) => {
-            respondTo(event, responseText);
+        .then(({ responseText, imageURL }) => {
+            if (imageURL) {
+                respondTo(event, `Image received. URL length: ${imageURL.length}`);
+            } else if (responseText) {
+                respondTo(event, responseText);
+            }
         })
         .catch((error) => {
             respondTo(event, error.message);

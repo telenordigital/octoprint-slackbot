@@ -3,13 +3,14 @@ const FormData = require('form-data');
 
 const config = require('./config');
 
-const baseURI = `http://${config.get('octoprintAddress')}/api/`;
+const baseURI = `http://${config.get('octoprintAddress')}`;
+const apiBaseURI = `${baseURI}/api`;
 const defaultHeaders = {
     'X-Api-Key': config.get('octoprintApiKey'),
 };
 
 function apiRequest(resource) {
-    return fetch(`${baseURI}${resource}`, { headers: Object.assign({}, defaultHeaders, { 'Content-Type': 'application/json' }) })
+    return fetch(`${apiBaseURI}/${resource}`, { headers: Object.assign({}, defaultHeaders, { 'Content-Type': 'application/json' }) })
         .then(res => res.json());
 }
 
@@ -18,7 +19,7 @@ function apiUpload(resource, filename, readableStream) {
     form.append('file', readableStream);
     form.append('filename', filename);
 
-    return fetch(`${baseURI}${resource}`, {
+    return fetch(`${apiBaseURI}/${resource}`, {
         headers: form.getHeaders(defaultHeaders),
         method: 'POST',
         body: form,
@@ -30,6 +31,11 @@ function apiUpload(resource, filename, readableStream) {
         console.error(res.status, res.statusText);
         throw new TypeError("Oops, we haven't got JSON!");
     });
+}
+
+function snapshot() {
+    return fetch(`${baseURI}/webcam/?action=snapshot`)
+        .then(response => response.blob());
 }
 
 module.exports = {
@@ -47,5 +53,8 @@ module.exports = {
     },
     uploadLocalFile(filename, readableStream) {
         return apiUpload('files/local', filename, readableStream);
+    },
+    getSnapshot() {
+        return snapshot();
     },
 };
