@@ -22,6 +22,8 @@ bot.on('start', () => {
     botUser = bot.users.find(u => u.name === PRINTER_NAME);
     botUserId = botUser.id;
 
+    bot.postMessageToGroup('octoprint-bot-test', 'Hi');
+
     setInterval(() => {
         console.log('Checing connection - ready state: ', bot.ws.readyState);
         bot.postMessageToGroup('octoprint-bot-test', 'ping', (data) => {
