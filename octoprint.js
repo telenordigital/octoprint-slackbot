@@ -35,7 +35,12 @@ function apiUpload(resource, filename, readableStream) {
 
 function snapshot() {
     return fetch(`${baseURI}/webcam/?action=snapshot`)
-        .then(response => response.blob());
+        .then((res) => {
+            if (res.ok) {
+                return res.blob();
+            }
+            return `Not OK response: ${res.status} ${res.statusText}`;
+        });
 }
 
 module.exports = {
