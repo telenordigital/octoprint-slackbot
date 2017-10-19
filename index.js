@@ -64,6 +64,7 @@ bot.on('message', (event) => {
     }
 
     const fileInfoPromise = (isFile ? getFileInfo(file.id) : Promise.resolve(null));
+    respondTo(event, `test`);
 
     messageHandler.handle({ text, fileInfoPromise })
         .then(({ responseText, imageURL }) => {
