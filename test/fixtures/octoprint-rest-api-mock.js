@@ -1,5 +1,9 @@
+const fs = require('fs');
+const path = require('path');
+
 const Busboy = require('busboy');
 const config = require('../../config');
+const Response = require('node-fetch').Response;
 
 const defaultOpts = {
     headers: {
@@ -192,5 +196,11 @@ module.exports = (fetchMock) => {
         methods.forEach((method) => {
             apiPath[method](fetchMock, method.toUpperCase(), path);
         });
+    });
+
+    fetchMock.mock({
+        method: 'get',
+        matcher: 'end:/webcam/?action=snapshot',
+        response: new Response(fs.createReadStream(path.join(__dirname, 'benchy.jpg')), { status: 200, statusText: 'OK', headers: { 'Content-Type': 'image/jpeg' } }),
     });
 };

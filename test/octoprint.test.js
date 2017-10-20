@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const fileType = require('file-type');
 const fetchMock = require('fetch-mock').restore().sandbox();
 require('./fixtures/octoprint-rest-api-mock')(fetchMock);
 const proxyquire = require('proxyquire');
@@ -46,4 +47,10 @@ describe('octoprint', () => {
             assert.isTrue(res.done, 'Done');
         });
     });
+
+    it('get snapshot', () => octoprint.getSnapshot().then((imageBuffer) => {
+        const type = fileType(imageBuffer);
+        assert.equal(type.mime, 'image/jpeg');
+        assert.equal(imageBuffer.length, 504775);
+    }));
 });

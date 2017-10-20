@@ -67,10 +67,16 @@ bot.on('message', (event) => {
 
     messageHandler.handle({ text, fileInfoPromise })
         .then(({ responseText, imageURL }) => {
+            let attachements;
             if (imageURL) {
-                respondTo(event, `Image received. URL length: ${imageURL.length}`);
-            } else if (responseText) {
-                respondTo(event, responseText);
+                attachements = [{
+                    fallback: 'Snapshot of octoprint webcam',
+                    image_url: imageURL,
+                }];
+            }
+
+            if (responseText) {
+                respondTo(event, responseText, attachements);
             }
         })
         .catch((error) => {

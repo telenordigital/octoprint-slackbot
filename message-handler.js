@@ -1,5 +1,5 @@
 const octoprint = require('./octoprint');
-const blobUtil = require('blob-util');
+const fileType = require('file-type');
 
 function promiseProps(obj) {
     const keys = Object.keys(obj);
@@ -37,9 +37,13 @@ module.exports = {
             }));
         } else if (text.includes('snapshot')) {
             return octoprint.getSnapshot()
-                .then(imageBlob => ({
-                    imageURL: blobUtil.createObjectURL(imageBlob),
-                }));
+                .then((imageBuffer) => {
+                    const type = fileType(imageBuffer);
+                    return {
+                        responseText: 'Current webcam snapshot',
+                        imageURL: `data:${type.mime};base64,${imageBuffer.toString('base64')}`,
+                    };
+                });
         }
         return Promise.resolve('Yo!');
     },
