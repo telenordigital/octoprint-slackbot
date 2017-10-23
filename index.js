@@ -1,4 +1,6 @@
 const SlackBot = require('slackbots');
+const fetch = require('node-fetch');
+const FormData = require('form-data');
 const messageHandler = require('./message-handler');
 const config = require('./config');
 
@@ -16,6 +18,11 @@ const bot = new SlackBot({
 });
 let botUser;
 let botUserId;
+
+process.on('unhandledRejection', (reason, p) => {
+    console.error('Unhandled promise rejection', reason, p);
+    process.exit(1);
+});
 
 bot.on('start', () => {
     console.log('Bot started');
@@ -50,32 +57,44 @@ function exit(...msg) {
 }
 
 function respondTo(event, text, attachment) {
-    return bot.postMessage(event.channel, text, { as_user: true, attachments: [attachment] });
+    return bot.postMessage(event.channel, text, { as_user: true, attachments: [attachment] })
+        .catch(err => console.error(err));
+}
+
+function uploadFile(channels, imageStream, responseText) {
+    const form = new FormData();
+    form.append('file', imageStream);
+    form.append('channels', channels);
+    form.append('token', API_TOKEN);
+    if (responseText) {
+        form.append('initial_comment', responseText);
+    }
+
+    fetch('https://slack.com/api/files.upload', { method: 'POST', body: form })
+        .then(res => console.log('File uploaded successfully', res))
+        .catch(err => console.error('File upload error', err));
 }
 
 bot.on('message', (event) => {
     const { text, type, file } = event;
     const isMention = text && text.includes(`<@${botUserId}>`);
     const isFile = type && type === 'file_shared' && file;
+    const isFromMyself = botUserId === event.user_id;
     // const isFileAnnouncement = type && type === 'message' && file;
 
-    if (!isMention && !isFile) {
+    const isOfInterest = (isMention || isFile) && !isFromMyself;
+    if (!isOfInterest) {
         return; // ignore messages that doesn't mention the bot
     }
 
     const fileInfoPromise = (isFile ? getFileInfo(file.id) : Promise.resolve(null));
 
     messageHandler.handle({ text, fileInfoPromise })
-        .then(({ responseText, imageURL }) => {
+        .then(({ responseText, imageStream }) => {
             let attachements;
-            if (imageURL) {
-                attachements = [{
-                    fallback: 'Snapshot of octoprint webcam',
-                    image_url: imageURL,
-                }];
-            }
-
-            if (responseText) {
+            if (imageStream) {
+                uploadFile(event.channel, imageStream, responseText);
+            } else if (responseText) {
                 respondTo(event, responseText, attachements);
             }
         })

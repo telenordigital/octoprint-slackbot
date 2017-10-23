@@ -1,6 +1,5 @@
 const fetch = require('node-fetch');
 const FormData = require('form-data');
-const concat = require('concat-stream');
 
 const config = require('./config');
 
@@ -41,15 +40,7 @@ function snapshot() {
                 return res.body;
             }
             return Promise.reject(`Not OK response: ${res.status} ${res.statusText}`);
-        })
-        .then(binaryStream => new Promise((resolve, reject) => {
-            binaryStream
-                .on('error', (error) => {
-                    console.error('Error converting binary image stream to Blob', error);
-                    reject(error);
-                })
-                .pipe(concat(resolve));
-        }));
+        });
 }
 
 module.exports = {

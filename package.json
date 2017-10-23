@@ -14,9 +14,7 @@
     "test": "NODE_ENV=test mocha"
   },
   "dependencies": {
-    "concat-stream": "^1.6.0",
     "convict": "^4.0.0",
-    "file-type": "^7.2.0",
     "form-data": "^2.3.1",
     "node-fetch": "^1.7.2",
     "slackbots": "^1.0.2"
@@ -24,10 +22,12 @@
   "devDependencies": {
     "busboy": "^0.2.14",
     "chai": "^4.1.2",
+    "concat-stream": "^1.6.0",
     "eslint": "^4.5.0",
     "eslint-config-airbnb-base": "^11.3.2",
     "eslint-plugin-import": "^2.7.0",
     "fetch-mock": "^5.12.2",
+    "file-type": "^7.2.0",
     "mocha": "^3.5.3",
     "proxyquire": "^1.8.0"
   }

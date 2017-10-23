@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const fileType = require('file-type');
+const concat = require('concat-stream');
 const fetchMock = require('fetch-mock').restore().sandbox();
 require('./fixtures/octoprint-rest-api-mock')(fetchMock);
 const proxyquire = require('proxyquire');
@@ -48,9 +49,18 @@ describe('octoprint', () => {
         });
     });
 
-    it('get snapshot', () => octoprint.getSnapshot().then((imageBuffer) => {
-        const type = fileType(imageBuffer);
-        assert.equal(type.mime, 'image/jpeg');
-        assert.equal(imageBuffer.length, 504775);
+    it('get snapshot', () => octoprint.getSnapshot().then((imageStream) => {
+        return new Promise((resolve, reject) => {
+            imageStream
+                .on('error', (error) => {
+                    console.error('Error converting binary image stream to buffer', error);
+                    reject(error);
+                })
+                .pipe(concat(resolve));
+        }).then((imageBuffer) => {
+            const type = fileType(imageBuffer);
+            assert.equal(type.mime, 'image/jpeg');
+            assert.equal(imageBuffer.length, 504775);
+        });
     }));
 });
