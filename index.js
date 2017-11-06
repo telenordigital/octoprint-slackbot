@@ -24,6 +24,13 @@ process.on('unhandledRejection', (reason, p) => {
     process.exit(1);
 });
 
+function websocketTrouble() {
+    console.error('Websocket connection error. Exiting.');
+    process.exit(1);
+}
+
+let messageId = 0;
+let connectionTestTimer;
 bot.on('start', () => {
     console.log('Bot started');
     botUser = bot.users.find(u => u.name === PRINTER_NAME);
@@ -32,13 +39,13 @@ bot.on('start', () => {
     bot.postMessageToGroup('octoprint-bot-test', 'Hi');
 
     setInterval(() => {
-        console.log('Checing connection - ready state: ', bot.ws.readyState);
-        bot.postMessageToGroup('octoprint-bot-test', 'ping', (data) => {
-            if (data && (data instanceof Error || data.ok === false)) {
-                process.exit('Connection test failed!', data.message || data.error);
-            }
-        });
-    }, 60000);
+        messageId += 1;
+        bot.ws.send(JSON.stringify({
+            id: messageId,
+            type: 'ping',
+        }));
+        connectionTestTimer = setTimeout(websocketTrouble, 5000);
+    }, 10000);
 });
 
 function getFileInfo(fileId) {
@@ -75,15 +82,20 @@ function uploadFile(channels, imageStream, responseText) {
         .catch(err => console.error('File upload error', err));
 }
 
+
 bot.on('message', (event) => {
     const { text, type, file } = event;
     const isMention = text && text.includes(`<@${botUserId}>`);
     const isFile = type && type === 'file_shared' && file;
     const isFromMyself = botUserId === event.user_id;
+    const isPong = type && type === 'pong';
     // const isFileAnnouncement = type && type === 'message' && file;
 
     const isOfInterest = (isMention || isFile) && !isFromMyself;
-    if (!isOfInterest) {
+    if (isPong) {
+        clearTimeout(connectionTestTimer);
+        return;
+    } else if (!isOfInterest) {
         return; // ignore messages that doesn't mention the bot
     }
 
