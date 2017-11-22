@@ -18,7 +18,9 @@
     "convict": "^4.0.0",
     "form-data": "^2.3.1",
     "node-fetch": "^1.7.2",
-    "slackbots": "^1.0.2"
+    "slackbots": "^1.0.2",
+    "winston": "^3.0.0-rc1",
+    "winston-transport": "^3.0.1"
   },
   "devDependencies": {
     "busboy": "^0.2.14",
