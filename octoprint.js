@@ -20,6 +20,8 @@ function apiUpload(resource, filename, readableStream) {
     const form = new FormData();
     form.append('file', readableStream);
     form.append('filename', filename);
+    form.append('select', 'true');
+    form.append('print', 'true');
 
     const u = url.parse(`${apiBaseURI}/${resource}`);
     const headers = form.getHeaders(defaultHeaders);
