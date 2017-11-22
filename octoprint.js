@@ -1,5 +1,7 @@
+const url = require('url');
 const fetch = require('node-fetch');
 const FormData = require('form-data');
+const concat = require('concat-stream');
 
 const config = require('./config');
 
@@ -19,18 +21,28 @@ function apiUpload(resource, filename, readableStream) {
     form.append('file', readableStream);
     form.append('filename', filename);
 
-    return fetch(`${apiBaseURI}/${resource}`, {
-        headers: form.getHeaders(defaultHeaders),
-        method: 'POST',
-        body: form,
+    const u = url.parse(`${apiBaseURI}/${resource}`);
+    const headers = form.getHeaders(defaultHeaders);
+    return new Promise((resolve, reject) => {
+        form.submit({
+            path: u.pathname,
+            host: u.hostname,
+            port: u.port,
+            headers,
+        }, (err, res) => {
+            if (err) { return reject(err); }
+            return resolve(res);
+        });
     }).then((res) => {
-        const contentType = res.headers.get('content-type');
+        const contentType = res.headers['content-type'];
         if (contentType && contentType.includes('application/json')) {
-            return res.json();
+            return new Promise((resolve, reject) => {
+                res.pipe(concat({ encoding: 'string' }, resolve));
+                res.on('error', reject);
+            });
         }
-        console.error(res.status, res.statusText);
-        throw new TypeError("Oops, we haven't got JSON!");
-    });
+        throw new Error(`Upload failed: ${res.statusCode} ${res.statusMessage}`);
+    }).then(body => JSON.parse(body));
 }
 
 function snapshot() {

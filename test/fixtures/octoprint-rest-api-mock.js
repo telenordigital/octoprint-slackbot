@@ -155,6 +155,13 @@ const api = {
                         return;
                     }
 
+                    if (!opts.headers['content-length']) {
+                        resolve({
+                            status: 400,
+                        });
+                        return;
+                    }
+
                     resolve({
                         status: 200,
                         body: {
@@ -190,11 +197,11 @@ module.exports = (fetchMock) => {
     }, 401);
 
     // Add mock response handlers for paths defined in api above
-    Object.keys(api).forEach((path) => {
-        const apiPath = api[path];
+    Object.keys(api).forEach((p) => {
+        const apiPath = api[p];
         const methods = Object.keys(apiPath);
         methods.forEach((method) => {
-            apiPath[method](fetchMock, method.toUpperCase(), path);
+            apiPath[method](fetchMock, method.toUpperCase(), p);
         });
     });
 
