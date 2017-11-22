@@ -1,4 +1,5 @@
 const convict = require('convict');
+const path = require('path');
 
 const config = convict({
     env: {
@@ -34,7 +35,7 @@ const config = convict({
 });
 
 const env = config.get('env');
-config.loadFile(`./config/${env}.json`);
+config.loadFile(path.join(__dirname, `./config/${env}.json`));
 config.validate({ allowed: 'strict' });
 
 module.exports = config;
