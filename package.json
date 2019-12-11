@@ -25,7 +25,7 @@
   "devDependencies": {
     "busboy": "^0.2.14",
     "chai": "^4.1.2",
-    "eslint": "^4.5.0",
+    "eslint": "^4.18.2",
     "eslint-config-airbnb-base": "^11.3.2",
     "eslint-plugin-import": "^2.7.0",
     "fetch-mock": "^5.12.2",
