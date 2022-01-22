@@ -17,7 +17,7 @@
     "concat-stream": "^2.0.0",
     "convict": "^5.2.0",
     "form-data": "^3.0.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.1.1",
     "slackbots": "^1.0.2",
     "winston": "^3.0.0-rc1",
     "winston-transport": "^4.3.0"
